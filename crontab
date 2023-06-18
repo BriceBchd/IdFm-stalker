@@ -1,0 +1,2 @@
+*/2 * * * * /usr/local/bin/python /app/disruptions.py > /tmp/output.txt 2>&1
+0 0 * * * find /path/to/files -name "disruptions_*.ndjson" -type f -mtime +7 -delete

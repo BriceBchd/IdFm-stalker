@@ -1,6 +1,7 @@
 import requests
 import json
 import os
+import datetime
 
 # import apiKey from .env
 from dotenv import load_dotenv
@@ -68,14 +69,17 @@ def get_reports_by_line(lines):
         
         for disruption in response.json()['disruptions']:
             if disruption['status'] == 'active':
-                disruptions.append(disruption)
+                if not any(tag in disruption['tags'] for tag in ['Ascenseur']):
+                    disruptions.append(disruption)
     
     return disruptions
 
-# # write dict to file
+# write dict to file
 def write_to_file(data, file_name):
-    with open(file_name, 'w') as file:
-        json.dump(data, file)
+    with open(file_name, 'w', encoding='utf-8') as file:
+        for item in data:
+            file.write(json.dumps(item, ensure_ascii=False))
+            file.write('\n')
         
         
 
@@ -85,5 +89,6 @@ if __name__ == '__main__':
     write_to_file(lines, 'lines.json')
     disruptions = get_reports_by_line(lines)
     print("nb d'incidents: ", len(disruptions))
-    write_to_file(disruptions, 'disruptions.json')
+    file_name = f'/app/data/disruptions_{datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")}.ndjson'
+    write_to_file(disruptions, file_name)
     # get_message_info_traffic()
