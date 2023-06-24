@@ -15,7 +15,14 @@ Ile de France Mobilité - Récupération des informations de l'API Open Data
 - Le script va créer un fichier `disruptions.json` avec la liste des perturbations sur les lignes de métro (tram et RER à ajouter plus tard)
 - Lancer le conteneur docker en fond :
     - `docker build -t idfm-stalker .`
-    - `docker run -d --name idfm-stalker idfm-stalker`
+    - `docker run -d --rm --network elastic-cluster_default --name idfm-stalker idfm-stalker`
+
+## Lancer l'agent Filebeat
+- Se connecter au conteneur docker
+    - `docker exec -it idfm-stalker bash`
+- Lancer l'agent Filebeat
+    - `cd /etc/filebeat`
+    - `./filebeat -e -c ./filebeat.yml`
 
 ## TODO
 - [x] Récupérer la liste des lignes de métro
