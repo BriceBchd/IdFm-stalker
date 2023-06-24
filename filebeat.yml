@@ -1,0 +1,17 @@
+filebeat.inputs:
+- type: log
+  paths:
+    - /app/data/disruptions*.ndjson
+  json.keys_under_root: true
+  json.add_error_key: true
+  json.message_key: log
+
+output.elasticsearch:
+  hosts: ["https://es01:9200"]
+  username: "filebeat-writer"
+  password: "changeme1"
+  # add ca cert
+  ssl.enabled: true
+  ssl.certificate_authorities: ["/etc/filebeat/certs/ca.crt"]
+  ss.certificate_format
+  ssl.verification_mode:
