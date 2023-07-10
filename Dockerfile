@@ -1,4 +1,15 @@
-FROM python:3.9-slim
+FROM python:3.11.0-slim-bullseye
+
+# Install cron & curl
+RUN apt-get update && \
+    apt-get install -y curl cron && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Install Filebeat
+RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.8.0-amd64.deb && \
+    dpkg -i filebeat-8.8.0-amd64.deb && \
+    rm filebeat-8.8.0-amd64.deb
 
 # set the working directory
 WORKDIR /app
@@ -14,29 +25,14 @@ COPY requirements.txt .
 # install the required packages
 RUN pip install --no-cache-dir -r requirements.txt
 
-# install cron
-RUN apt-get update && apt-get -y install cron
-
-# install Filebeat
-RUN apt-get update && apt-get -y install curl
-RUN curl -L -O https://artifacts.elastic.co/downloads/beats/filebeat/filebeat-8.8.0-linux-x86_64.tar.gz
-RUN tar xzvf filebeat-8.8.0-linux-x86_64.tar.gz
-RUN mv filebeat-8.8.0-linux-x86_64 /etc/filebeat
-
-# copy the crontab file
-COPY crontab /etc/cron.d/my-cron
+# copy the cron file to the cron.d directory
+COPY cronfile /etc/cron.d/cronfile
 
 # give execution rights on the cron job
-RUN chmod 0644 /etc/cron.d/my-cron
+RUN chmod 0644 /etc/cron.d/cronfile
 
-# apply the cron job
-RUN crontab /etc/cron.d/my-cron
+# apply cron job
+RUN crontab /etc/cron.d/cronfile
 
-# copy the filebeat configuration file
-COPY filebeat.yml /etc/filebeat/filebeat.yml
-
-# add the ca certificate
-COPY ca.crt /etc/filebeat/certs/ca.crt
-
-# run the command on container startup
-CMD service cron start && tail -f /dev/null
+# CMD run cron and filebeat
+CMD cron && filebeat -e -c /etc/filebeat/filebeat.yml

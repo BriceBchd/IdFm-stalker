@@ -1,0 +1,15 @@
+version: '2.2'
+
+services:
+  filebeat:
+    build: .
+    user: root
+    volumes:
+      - ./filebeat.yml:/etc/filebeat/filebeat.yml:ro
+    networks:
+      - elastic-cluster_default
+    restart: unless-stopped
+
+networks:
+  elastic-cluster_default:
+    external: true

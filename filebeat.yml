@@ -6,10 +6,6 @@ filebeat.inputs:
   json.add_error_key: true
   json.message_key: log
 
-output.elasticsearch:
-  hosts: ["https://es01:9200"]
-  username: "elastic"
-  password: "changeme1"
-  ssl.enabled: true
-  ssl.verification_mode: certificate
-  ssl.certificate_authorities: ["ca.crt"]
+output.logstash:
+  hosts: ["logstash:5044"]
+
